@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FAAAH!</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #f0f0f0;
+      font-family: 'Georgia', 'Times New Roman', serif;
+    }
+
+    h1 {
+      font-size: 3.5rem;
+      color: #111;
+      margin-bottom: 3rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      user-select: none;
+    }
+
+    .btn-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      /* Soft shadow beneath the sphere */
+      filter: drop-shadow(0 25px 20px rgba(0, 0, 0, 0.3));
+    }
+
+    .play-btn {
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      cursor: pointer;
+      outline: none;
+      border: none;
+      position: relative;
+      overflow: hidden;
+
+      /* Realistic 3D red sphere: dark at edges, bright red center-top */
+      background:
+        /* Top-left specular highlight (white glare) */
+        radial-gradient(ellipse 35% 25% at 38% 30%, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.0) 100%),
+        /* Broader diffuse highlight */
+        radial-gradient(ellipse 50% 40% at 42% 38%, rgba(255,200,200,0.5) 0%, transparent 100%),
+        /* Secondary rim light bottom-right */
+        radial-gradient(ellipse 30% 20% at 68% 75%, rgba(255,120,120,0.25) 0%, transparent 100%),
+        /* Core sphere gradient */
+        radial-gradient(circle at 45% 42%, #f44336 0%, #d32f2f 30%, #b71c1c 55%, #7f0000 80%, #4a0000 100%);
+
+      box-shadow:
+        /* Outer glow */
+        0 0 40px rgba(200, 30, 30, 0.15),
+        /* Depth shadow */
+        0 12px 35px rgba(0, 0, 0, 0.35),
+        /* Inner bottom shadow for 3D curvature */
+        inset 0 -10px 20px rgba(0, 0, 0, 0.5),
+        /* Inner top light */
+        inset 0 10px 25px rgba(255, 180, 180, 0.2);
+
+      transition: transform 0.12s ease, box-shadow 0.12s ease;
+    }
+
+    /* Glass-like specular reflection overlay */
+    .play-btn::before {
+      content: '';
+      position: absolute;
+      top: 6%;
+      left: 18%;
+      width: 55%;
+      height: 35%;
+      border-radius: 50%;
+      background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.7) 0%,
+        rgba(255, 255, 255, 0.2) 60%,
+        transparent 100%
+      );
+      transform: rotate(-8deg);
+      pointer-events: none;
+    }
+
+
+
+    .play-btn:hover {
+      transform: scale(1.03);
+      box-shadow:
+        0 0 50px rgba(200, 30, 30, 0.2),
+        0 14px 40px rgba(0, 0, 0, 0.4),
+        inset 0 -10px 20px rgba(0, 0, 0, 0.5),
+        inset 0 10px 25px rgba(255, 180, 180, 0.25);
+    }
+
+    .play-btn:active {
+      transform: scale(0.96) translateY(3px);
+      box-shadow:
+        0 0 25px rgba(200, 30, 30, 0.1),
+        0 5px 18px rgba(0, 0, 0, 0.35),
+        inset 0 -6px 14px rgba(0, 0, 0, 0.5),
+        inset 0 6px 16px rgba(255, 180, 180, 0.15);
+    }
+
+    .play-btn:focus-visible {
+      outline: 3px solid rgba(244, 67, 54, 0.5);
+      outline-offset: 6px;
+    }
+
+    /* Pop animation when sound plays */
+    @keyframes pop {
+      0%   { transform: scale(0.96); }
+      40%  { transform: scale(1.08); }
+      100% { transform: scale(1); }
+    }
+    .play-btn.playing {
+      animation: pop 0.3s ease-out;
+    }
+  </style>
+</head>
+<body>
+  <h1>FAAAH!</h1>
+
+  <div class="btn-wrapper">
+    <button class="play-btn" id="playBtn" aria-label="Play FAAAH sound"></button>
+  </div>
+
+  <audio id="audio" src="faaah.mp3" preload="auto"></audio>
+
+  <script>
+    const btn = document.getElementById('playBtn');
+    const audio = document.getElementById('audio');
+
+    btn.addEventListener('click', () => {
+      // Restart if already playing
+      audio.currentTime = 0;
+      audio.play();
+
+      // Trigger pop animation
+      btn.classList.remove('playing');
+      // Force reflow so the animation restarts
+      void btn.offsetWidth;
+      btn.classList.add('playing');
+    });
+
+    btn.addEventListener('animationend', () => {
+      btn.classList.remove('playing');
+    });
+  </script>
+</body>
+</html>
